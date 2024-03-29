@@ -41,6 +41,11 @@
             path = ./flake-parts;
             description = "A simple flake using flake-parts";
           };
+
+          latex = {
+            path = ./latex;
+            description = "LaTeX flake using latexmk";
+          };
         };
       };
     };

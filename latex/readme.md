@@ -1,0 +1,1 @@
+# Simple flake-parts template
