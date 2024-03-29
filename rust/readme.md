@@ -1,1 +1,1 @@
-# Simple flake-parts template
+# Rust project

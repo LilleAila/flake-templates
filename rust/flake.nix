@@ -7,6 +7,9 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     devshell.url = "github:numtide/devshell";
     devshell.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Basically cargo but nix:
+    naersk.url = "github:nix-community/naersk";
   };
 
   outputs = {...} @ inputs:
@@ -28,32 +31,20 @@
         ...
       }: let
         dependencies = with pkgs; [
-          texliveFull
-          pandoc
-          (python311.withPackages (python-pkgs:
-            with python-pkgs; [
-              pygments # For minted
-            ]))
+          cargo
+          rustc
+          rustfmt
+          rustPackages.clippy
+          rust-analyzer
         ];
+        naersk-lib = pkgs.callPackage inputs.naersk {};
       in {
         devshells.default = {
           packages = dependencies;
         };
 
-        packages = let
-          document = pkgs.stdenv.mkDerivation {
-            name = "LaTeX Document";
-            src = ./.;
-            buildInputs = dependencies;
-            phases = ["unpackPhase" "buildPhase"];
-            buildPhase = ''
-              mkdir -p $out
-              latexmk -pdf -shell-escape ./document.tex
-              mv document.pdf $out/document.pdf
-            '';
-          };
-        in {
-          default = document;
+        packages = {
+          default = naersk-lib.buildPackage ./.;
         };
       };
     };
