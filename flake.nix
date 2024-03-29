@@ -9,30 +9,39 @@
     devshell.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { ... }@inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-    systems = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
-
-    imports = [
-      inputs.devshell.flakeModule
-    ];
-
-    devshells.default = {
-      packages = with pkgs; [
-        nil
-        alejandra
+  outputs = {...} @ inputs:
+    inputs.flake-parts.lib.mkFlake {inherit inputs;} {
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
       ];
-    };
 
-    templates = {
-      flake-parts = {
-        path = ./flake-parts;
-        description = "A simple flake using flake-parts";
+      imports = [
+        inputs.devshell.flakeModule
+      ];
+
+      perSystem = {
+        pkgs,
+        system,
+        ...
+      }: {
+        devshells.default = {
+          packages = with pkgs; [
+            nil
+            alejandra
+          ];
+        };
+      };
+
+      flake = {
+        templates = {
+          flake-parts = {
+            path = ./flake-parts;
+            description = "A simple flake using flake-parts";
+          };
+        };
       };
     };
-  };
 }
